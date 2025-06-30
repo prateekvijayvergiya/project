@@ -8,6 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { useVisitors } from '@/hooks/useVisitors';
+import { useAuth } from '@/contexts/AuthContext';
 import { 
   UserPlus, 
   Save, 
@@ -47,6 +48,7 @@ export function VisitorForm({
   mode = 'create' 
 }: VisitorFormProps) {
   const { addVisitor } = useVisitors();
+  const { user } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(
@@ -63,10 +65,10 @@ export function VisitorForm({
     notes: initialData?.notes || '',
   });
 
-  const [errors, setErrors] = useState<Partial<VisitorFormData>>({});
+  const [errors, setErrors] = useState<Partial<Omit<VisitorFormData, 'duration'> & { duration?: string }>>({});
 
   const validateForm = (): boolean => {
-    const newErrors: Partial<VisitorFormData> = {};
+    const newErrors: Partial<Omit<VisitorFormData, 'duration'> & { duration?: string }> = {};
 
     if (!formData.name.trim()) {
       newErrors.name = 'Full name is required';
@@ -99,10 +101,12 @@ export function VisitorForm({
       return;
     }
 
+    if (!user) return;
+
     setIsSubmitting(true);
 
     try {
-      await addVisitor(formData);
+      await addVisitor({ ...formData, user_id: user.id });
       
       // Reset form on success
       if (mode === 'create') {

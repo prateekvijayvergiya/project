@@ -32,14 +32,13 @@ import {
   Clock,
   LogIn
 } from 'lucide-react';
-import { format } from 'date-fns';
 
 interface UserProfileProps {
   variant?: 'desktop' | 'mobile';
 }
 
 export function UserProfile({ variant = 'desktop' }: UserProfileProps) {
-  const { user, signOut, session, isAuthenticated } = useAuth();
+  const { user, signOut, isAuthenticated } = useAuth();
   const [isSigningOut, setIsSigningOut] = useState(false);
 
   const handleSignOut = async () => {

@@ -9,14 +9,13 @@ import {
   Users, 
   UserCheck, 
   Clock, 
-  TrendingUp,
   Calendar,
   AlertTriangle,
   Activity,
   UserX,
   Eye
 } from 'lucide-react';
-import { format, addMonths, isAfter } from 'date-fns';
+import { format } from 'date-fns';
 
 interface VisitorsDashboardProps {
   onNavigateToVisitors?: () => void;
@@ -48,7 +47,7 @@ export function VisitorsDashboard({ onNavigateToVisitors }: VisitorsDashboardPro
     .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
     .slice(0, 5);
 
-  const handleViewExpiringVisitors = (visitorIds: string[]) => {
+  const handleViewExpiringVisitors = () => {
     // Navigate to visitors list and highlight expiring visitors
     onNavigateToVisitors?.();
   };
@@ -165,7 +164,7 @@ export function VisitorsDashboard({ onNavigateToVisitors }: VisitorsDashboardPro
                 <Button 
                   variant="outline" 
                   size="sm"
-                  onClick={() => handleViewExpiringVisitors(expiringVisitors.map(v => v.id))}
+                  onClick={handleViewExpiringVisitors}
                   className="text-xs flex-shrink-0"
                 >
                   <Eye className="h-3 w-3 mr-1" />
@@ -231,7 +230,7 @@ export function VisitorsDashboard({ onNavigateToVisitors }: VisitorsDashboardPro
                   <Button 
                     variant="ghost" 
                     size="sm"
-                    onClick={() => handleViewExpiringVisitors(expiringVisitors.map(v => v.id))}
+                    onClick={handleViewExpiringVisitors}
                     className="text-xs"
                   >
                     View {expiringVisitors.length - 5} more expiring subscriptions

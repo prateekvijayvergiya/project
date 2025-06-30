@@ -1,9 +1,6 @@
 import { VisitorForm } from './VisitorForm';
-import { useNavigate } from '@/hooks/useNavigate';
 
 export function AddVisitor() {
-  const navigate = useNavigate();
-
   const handleSuccess = () => {
     // In a real router setup, this would navigate to the visitors list
     console.log('Visitor added successfully, navigating to visitors list');

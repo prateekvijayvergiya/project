@@ -1,0 +1,79 @@
+import { useParams, useNavigate } from 'react-router-dom';
+import { useVisitors } from '@/hooks/useVisitors';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { ArrowLeft, Phone, Calendar, Clock, User, FileText, Star } from 'lucide-react';
+
+export function VisitorDetails() {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const { visitors } = useVisitors();
+  const visitor = visitors.find(v => v.id === id);
+
+  if (!visitor) {
+    return (
+      <div className="p-6 text-center text-gray-500">Visitor not found.</div>
+    );
+  }
+
+  const initials = visitor.name
+    .split(' ')
+    .map((n) => n[0])
+    .join('')
+    .slice(0, 2)
+    .toUpperCase();
+
+  return (
+    <div className="max-w-lg mx-auto py-8 px-2 sm:px-4">
+      <Button variant="ghost" onClick={() => navigate(-1)} className="mb-4">
+        <ArrowLeft className="h-4 w-4 mr-2" /> Back to List
+      </Button>
+      <Card className="shadow-xl border-0">
+        <CardHeader className="bg-gradient-to-r from-blue-600 to-indigo-500 rounded-t-xl p-6 flex flex-col items-center">
+          <div className="w-20 h-20 rounded-full bg-white flex items-center justify-center shadow-lg mb-3 border-4 border-blue-200">
+            <span className="text-3xl font-bold text-blue-700">{initials}</span>
+          </div>
+          <CardTitle className="text-2xl font-bold text-white text-center w-full truncate">{visitor.name}</CardTitle>
+          <div className="mt-2 flex flex-wrap gap-2 justify-center">
+            <Badge className="bg-white text-blue-700 border-blue-200 font-semibold text-xs px-3 py-1 shadow">{visitor.subscription_type}</Badge>
+            <Badge className="bg-white text-green-700 border-green-200 font-semibold text-xs px-3 py-1 shadow capitalize">{visitor.status}</Badge>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4 p-6 bg-white rounded-b-xl">
+          <div className="flex items-center gap-3">
+            <Phone className="h-5 w-5 text-blue-500" />
+            <span className="font-medium text-gray-700">{visitor.phone}</span>
+          </div>
+          <div className="flex items-center gap-3">
+            <Calendar className="h-5 w-5 text-indigo-500" />
+            <span className="font-medium text-gray-700">Start Date: {visitor.start_date}</span>
+          </div>
+          <div className="flex items-center gap-3">
+            <Clock className="h-5 w-5 text-amber-500" />
+            <span className="font-medium text-gray-700">Duration: {visitor.duration} month(s)</span>
+          </div>
+          <div className="flex items-center gap-3">
+            <Star className="h-5 w-5 text-yellow-500" />
+            <span className="font-medium text-gray-700">Subscription: {visitor.subscription_type}</span>
+          </div>
+          <div className="flex items-center gap-3">
+            <User className="h-5 w-5 text-gray-500" />
+            <span className="font-medium text-gray-700">Status: {visitor.status}</span>
+          </div>
+          <div className="flex items-start gap-3">
+            <FileText className="h-5 w-5 text-gray-400 mt-1" />
+            <div>
+              <div className="font-semibold text-gray-700 mb-1">Notes</div>
+              <div className="text-gray-600 text-sm">{visitor.notes || <span className="text-gray-400">No notes</span>}</div>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <Calendar className="h-5 w-5 text-gray-400" />
+            <span className="text-xs text-gray-500">Created: {visitor.created_at}</span>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+} 

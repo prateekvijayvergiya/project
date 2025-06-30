@@ -1,0 +1,422 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  font-weight: 500;
+  color: #646cff;
+  text-decoration: inherit;
+}
+a:hover {
+  color: #535bf2;
+}
+
+body {
+  margin: 0;
+  display: flex;
+  place-items: center;
+  min-width: 320px;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+h1 {
+  font-size: 3.2em;
+  line-height: 1.1;
+}
+
+button {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #1a1a1a;
+  cursor: pointer;
+  transition: border-color 0.25s;
+}
+button:hover {
+  border-color: #646cff;
+}
+button:focus,
+button:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    color: #213547;
+    background-color: #ffffff;
+  }
+  a:hover {
+    color: #747bff;
+  }
+  button {
+    background-color: #f9f9f9;
+  }
+}
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 0 0% 3.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 3.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 3.9%;
+    --primary: 0 0% 9%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 0 0% 96.1%;
+    --secondary-foreground: 0 0% 9%;
+    --muted: 0 0% 96.1%;
+    --muted-foreground: 0 0% 45.1%;
+    --accent: 0 0% 96.1%;
+    --accent-foreground: 0 0% 9%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 89.8%;
+    --input: 0 0% 89.8%;
+    --ring: 0 0% 3.9%;
+    --chart-1: 12 76% 61%;
+    --chart-2: 173 58% 39%;
+    --chart-3: 197 37% 24%;
+    --chart-4: 43 74% 66%;
+    --chart-5: 27 87% 67%;
+    --radius: 0.5rem;
+  }
+  .dark {
+    --background: 0 0% 3.9%;
+    --foreground: 0 0% 98%;
+    --card: 0 0% 3.9%;
+    --card-foreground: 0 0% 98%;
+    --popover: 0 0% 3.9%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 0 0% 98%;
+    --primary-foreground: 0 0% 9%;
+    --secondary: 0 0% 14.9%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 0 0% 14.9%;
+    --muted-foreground: 0 0% 63.9%;
+    --accent: 0 0% 14.9%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 14.9%;
+    --input: 0 0% 14.9%;
+    --ring: 0 0% 83.1%;
+    --chart-1: 220 70% 50%;
+    --chart-2: 160 60% 45%;
+    --chart-3: 30 80% 55%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+    box-sizing: border-box;
+  }
+  body {
+    @apply bg-background text-foreground;
+    width: 100%;
+    overflow-x: hidden;
+  }
+  html {
+    overflow-x: hidden;
+    width: 100%;
+  }
+  #root {
+    width: 100%;
+    overflow-x: hidden;
+  }
+}
+
+/* Prevent horizontal scroll */
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Ensure all containers respect viewport width */
+* {
+  max-width: 100vw;
+}
+
+/* Force white background for all calendar components */
+.rdp {
+  background-color: white !important;
+  color: black !important;
+}
+
+.rdp * {
+  background-color: white !important;
+  color: black !important;
+}
+
+.rdp-months {
+  background-color: white !important;
+}
+
+.rdp-month {
+  background-color: white !important;
+}
+
+.rdp-table {
+  background-color: white !important;
+}
+
+.rdp-head {
+  background-color: white !important;
+}
+
+.rdp-tbody {
+  background-color: white !important;
+}
+
+.rdp-day {
+  background-color: white !important;
+  color: black !important;
+}
+
+.rdp-day:hover {
+  background-color: #f3f4f6 !important;
+  color: black !important;
+}
+
+.rdp-day_selected {
+  background-color: #2563eb !important;
+  color: white !important;
+}
+
+.rdp-day_today {
+  background-color: #dbeafe !important;
+  color: #1d4ed8 !important;
+}
+
+.rdp-head_cell {
+  background-color: white !important;
+  color: #6b7280 !important;
+}
+
+.rdp-caption {
+  background-color: white !important;
+  color: black !important;
+}
+
+.rdp-nav {
+  background-color: white !important;
+}
+
+.rdp-nav_button {
+  background-color: white !important;
+  color: black !important;
+}
+
+.rdp-nav_button:hover {
+  background-color: #f3f4f6 !important;
+  color: black !important;
+}
+
+/* Popover content styling - force white background */
+[data-radix-popper-content-wrapper] {
+  background-color: white !important;
+}
+
+[data-radix-popper-content-wrapper] * {
+  background-color: white !important;
+}
+
+/* Ensure calendar popover has white background */
+.calendar-popover {
+  background-color: white !important;
+}
+
+.calendar-popover * {
+  background-color: white !important;
+}
+
+.calendar-popover .rdp {
+  background-color: white !important;
+}
+
+.calendar-popover .rdp * {
+  background-color: white !important;
+}
+
+/* Force popover content to be white */
+[data-state="open"][data-side] {
+  background-color: white !important;
+}
+
+[data-state="open"][data-side] * {
+  background-color: white !important;
+}
+
+/* Additional calendar styling overrides */
+.rdp-root {
+  background-color: white !important;
+}
+
+.rdp-root * {
+  background-color: white !important;
+}
+
+/* Override any dark mode styles for calendar */
+.dark .rdp,
+.dark .rdp *,
+.dark [data-radix-popper-content-wrapper],
+.dark [data-radix-popper-content-wrapper] * {
+  background-color: white !important;
+  color: black !important;
+}
+
+/* Force table headers to have white background and proper styling */
+.table-header,
+.table-header th,
+[role="columnheader"],
+thead th,
+thead tr,
+thead {
+  background-color: white !important;
+  color: #374151 !important;
+}
+
+/* Force all table elements to have proper backgrounds */
+table,
+table *,
+.table,
+.table *,
+[role="table"],
+[role="table"] *,
+[role="row"],
+[role="row"] *,
+[role="cell"],
+[role="cell"] *,
+[role="columnheader"],
+[role="columnheader"] * {
+  background-color: white !important;
+}
+
+/* Specific table header styling */
+table thead,
+table thead tr,
+table thead th,
+.table thead,
+.table thead tr,
+.table thead th {
+  background-color: #f9fafb !important;
+  color: #374151 !important;
+  border-color: #e5e7eb !important;
+}
+
+/* Table body styling */
+table tbody,
+table tbody tr,
+table tbody td,
+.table tbody,
+.table tbody tr,
+.table tbody td {
+  background-color: white !important;
+  color: #374151 !important;
+}
+
+/* Button styling overrides */
+button[variant="ghost"],
+.button-ghost,
+[data-variant="ghost"] {
+  background-color: white !important;
+  color: #374151 !important;
+}
+
+button[variant="ghost"]:hover,
+.button-ghost:hover,
+[data-variant="ghost"]:hover {
+  background-color: #f3f4f6 !important;
+  color: #374151 !important;
+}
+
+button[variant="outline"],
+.button-outline,
+[data-variant="outline"] {
+  background-color: white !important;
+  color: #374151 !important;
+  border-color: #d1d5db !important;
+}
+
+button[variant="outline"]:hover,
+.button-outline:hover,
+[data-variant="outline"]:hover {
+  background-color: #f9fafb !important;
+  color: #374151 !important;
+}
+
+/* Force all buttons in tables to have white backgrounds */
+table button,
+.table button,
+[role="table"] button {
+  background-color: white !important;
+  color: #374151 !important;
+}
+
+table button:hover,
+.table button:hover,
+[role="table"] button:hover {
+  background-color: #f3f4f6 !important;
+  color: #374151 !important;
+}
+
+/* Dropdown menu styling */
+[data-radix-dropdown-menu-content],
+[data-radix-dropdown-menu-content] *,
+.dropdown-menu,
+.dropdown-menu * {
+  background-color: white !important;
+  color: #374151 !important;
+}
+
+/* Select component styling */
+[data-radix-select-content],
+[data-radix-select-content] *,
+.select-content,
+.select-content * {
+  background-color: white !important;
+  color: #374151 !important;
+}
+
+/* Input styling */
+input,
+textarea,
+select {
+  background-color: white !important;
+  color: #374151 !important;
+  border-color: #d1d5db !important;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  background-color: white !important;
+  color: #374151 !important;
+  border-color: #2563eb !important;
+}

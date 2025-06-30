@@ -155,7 +155,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // Clear local state immediately
       setUser(null);
       setSession(null);
-      
+      // Clear expiry alert sessionStorage flag for this user
+      if (user && user.id) {
+        sessionStorage.removeItem(`expiryAlertShown_${user.id}`);
+      }
       // Success toast will be handled by the auth state change listener
     } catch (error) {
       const message = error instanceof Error ? error.message : 'An error occurred during sign out';

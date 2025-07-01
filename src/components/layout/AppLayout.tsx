@@ -55,7 +55,7 @@ export function AppLayout({ children }: AppLayoutProps) {
             <h1 className="text-sm sm:text-lg font-bold text-gray-900 truncate">GymPulse</h1>
           </div>
           <div className="flex items-center space-x-1 sm:space-x-2 flex-shrink-0">
-            <div className="max-w-[120px] sm:max-w-none">
+            <div className="max-w-[220px] sm:max-w-none">
               <UserProfile variant="mobile" />
             </div>
             {isAuthenticated && (

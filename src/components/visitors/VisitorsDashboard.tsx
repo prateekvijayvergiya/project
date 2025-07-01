@@ -16,14 +16,31 @@ import {
   Eye
 } from 'lucide-react';
 import { format } from 'date-fns';
+import { useState } from 'react';
+import {
+  AlertDialog,
+  AlertDialogTrigger,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogFooter,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogAction,
+  AlertDialogCancel,
+} from '@/components/ui/alert-dialog';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface VisitorsDashboardProps {
   onNavigateToVisitors?: () => void;
 }
 
 export function VisitorsDashboard({ onNavigateToVisitors }: VisitorsDashboardProps) {
-  const { visitors, stats, loading } = useVisitors();
+  const { visitors, stats, loading, updateVisitor } = useVisitors();
   const { expiringVisitors } = useExpiryAlerts();
+  const [renewDialog, setRenewDialog] = useState<{ open: boolean; visitorId: string | null }>({ open: false, visitorId: null });
+  const [renewType, setRenewType] = useState<'basic' | 'premium' | 'vip'>('basic');
+  const [renewDuration, setRenewDuration] = useState<number>(1);
+  const [renewLoading, setRenewLoading] = useState(false);
 
   if (loading) {
     return (
@@ -50,6 +67,28 @@ export function VisitorsDashboard({ onNavigateToVisitors }: VisitorsDashboardPro
   const handleViewExpiringVisitors = () => {
     // Navigate to visitors list and highlight expiring visitors
     onNavigateToVisitors?.();
+  };
+
+  const openRenewDialog = (visitor: any) => {
+    setRenewType(visitor.subscription_type);
+    setRenewDuration(visitor.duration);
+    setRenewDialog({ open: true, visitorId: visitor.id });
+  };
+
+  const handleRenew = async () => {
+    if (!renewDialog.visitorId) return;
+    setRenewLoading(true);
+    try {
+      await updateVisitor(renewDialog.visitorId, {
+        subscription_type: renewType,
+        duration: renewDuration,
+        start_date: new Date().toISOString().slice(0, 10),
+        status: 'active',
+      });
+      setRenewDialog({ open: false, visitorId: null });
+    } finally {
+      setRenewLoading(false);
+    }
   };
 
   return (
@@ -180,12 +219,18 @@ export function VisitorsDashboard({ onNavigateToVisitors }: VisitorsDashboardPro
                 <p className="text-gray-500 text-center py-3 text-sm">No upcoming expirations</p>
               ) : (
                 expiringVisitors.slice(0, 5).map((visitor) => {
-                  const urgencyColor = visitor.daysUntilExpiry === 0 
-                    ? 'border-red-200 bg-red-50' 
-                    : visitor.daysUntilExpiry === 1 
-                      ? 'border-orange-200 bg-orange-50'
-                      : 'border-yellow-200 bg-yellow-50';
-                  
+                  let urgencyColor = '';
+                  let textColor = '';
+                  if (visitor.daysUntilExpiry === 0) {
+                    urgencyColor = 'border-red-200 bg-red-50';
+                    textColor = 'text-red-600';
+                  } else if (visitor.daysUntilExpiry === 1) {
+                    urgencyColor = 'border-orange-200 bg-orange-50';
+                    textColor = 'text-orange-600';
+                  } else {
+                    urgencyColor = 'border-yellow-200 bg-yellow-50';
+                    textColor = 'text-yellow-600';
+                  }
                   return (
                     <div key={visitor.id} className={`flex items-center justify-between p-2 border rounded-lg ${urgencyColor} w-full`}>
                       <div className="flex items-center space-x-2 min-w-0 flex-1">
@@ -196,13 +241,7 @@ export function VisitorsDashboard({ onNavigateToVisitors }: VisitorsDashboardPro
                         </div>
                         <div className="min-w-0 flex-1">
                           <p className="font-medium text-xs sm:text-sm truncate">{visitor.name}</p>
-                          <p className={`text-xs font-medium ${
-                            visitor.daysUntilExpiry === 0 
-                              ? 'text-red-600' 
-                              : visitor.daysUntilExpiry === 1 
-                                ? 'text-orange-600'
-                                : 'text-yellow-600'
-                          }`}>
+                          <p className={`text-xs font-medium ${textColor}`}>
                             {visitor.daysUntilExpiry === 0 
                               ? 'Expires today!' 
                               : visitor.daysUntilExpiry === 1 
@@ -221,6 +260,56 @@ export function VisitorsDashboard({ onNavigateToVisitors }: VisitorsDashboardPro
                       }`}>
                         {visitor.subscription_type}
                       </Badge>
+                      <AlertDialog open={renewDialog.open && renewDialog.visitorId === visitor.id} onOpenChange={open => setRenewDialog({ open, visitorId: open ? visitor.id : null })}>
+                        <AlertDialogTrigger asChild>
+                          <Button variant="outline" size="sm" className="ml-2 bg-blue-600 text-white hover:bg-blue-700 font-semibold px-3 py-1 rounded shadow">
+                            Renew
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Renew Subscription</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              Update the subscription type and duration for this visitor.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <div className="space-y-4 py-2">
+                            <div>
+                              <label className="block text-sm font-medium mb-1">Subscription Type</label>
+                              <Select value={renewType} onValueChange={v => setRenewType(v as 'basic' | 'premium' | 'vip')}>
+                                <SelectTrigger className="w-full">
+                                  <SelectValue placeholder="Select type" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="basic">Basic</SelectItem>
+                                  <SelectItem value="premium">Premium</SelectItem>
+                                  <SelectItem value="vip">VIP</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                            <div>
+                              <label className="block text-sm font-medium mb-1">Duration (months)</label>
+                              <Select value={String(renewDuration)} onValueChange={v => setRenewDuration(Number(v))}>
+                                <SelectTrigger className="w-full">
+                                  <SelectValue placeholder="Select duration" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="1">1 month</SelectItem>
+                                  <SelectItem value="3">3 months</SelectItem>
+                                  <SelectItem value="6">6 months</SelectItem>
+                                  <SelectItem value="12">12 months</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          </div>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel disabled={renewLoading}>Cancel</AlertDialogCancel>
+                            <AlertDialogAction onClick={handleRenew} disabled={renewLoading} className="bg-blue-600 hover:bg-blue-700 text-white">
+                              {renewLoading ? 'Renewing...' : 'Ok'}
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
                     </div>
                   );
                 })

@@ -4,12 +4,31 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ArrowLeft, Phone, Calendar, Clock, User, FileText, Star } from 'lucide-react';
+import { useState } from 'react';
+import {
+  AlertDialog,
+  AlertDialogTrigger,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogFooter,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogAction,
+  AlertDialogCancel,
+} from '@/components/ui/alert-dialog';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 export function VisitorDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { visitors } = useVisitors();
+  const { visitors, updateVisitor } = useVisitors();
   const visitor = visitors.find(v => v.id === id);
+
+  // Renew dialog state
+  const [renewOpen, setRenewOpen] = useState(false);
+  const [renewType, setRenewType] = useState<'basic' | 'premium' | 'vip'>(visitor?.subscription_type || 'basic');
+  const [renewDuration, setRenewDuration] = useState<number>(visitor?.duration || 1);
+  const [renewLoading, setRenewLoading] = useState(false);
 
   if (!visitor) {
     return (
@@ -23,6 +42,21 @@ export function VisitorDetails() {
     .join('')
     .slice(0, 2)
     .toUpperCase();
+
+  const handleRenew = async () => {
+    setRenewLoading(true);
+    try {
+      await updateVisitor(visitor.id, {
+        subscription_type: renewType,
+        duration: renewDuration,
+        start_date: new Date().toISOString().slice(0, 10),
+        status: 'active',
+      });
+      setRenewOpen(false);
+    } finally {
+      setRenewLoading(false);
+    }
+  };
 
   return (
     <div className="max-w-lg mx-auto py-8 px-2 sm:px-4">
@@ -75,6 +109,58 @@ export function VisitorDetails() {
           <div className="flex items-center gap-3">
             <Calendar className="h-5 w-5 text-gray-400" />
             <span className="text-xs text-gray-500">Created: {visitor.created_at}</span>
+          </div>
+          <div className="flex justify-end">
+            <AlertDialog open={renewOpen} onOpenChange={setRenewOpen}>
+              <AlertDialogTrigger asChild>
+                <Button variant="outline" className="bg-blue-600 text-white hover:bg-blue-700 font-semibold px-4 py-2 rounded shadow">
+                  Renew
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Renew Subscription</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Update the subscription type and duration for this visitor.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <div className="space-y-4 py-2">
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Subscription Type</label>
+                    <Select value={renewType} onValueChange={v => setRenewType(v as 'basic' | 'premium' | 'vip')}>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="basic">Basic</SelectItem>
+                        <SelectItem value="premium">Premium</SelectItem>
+                        <SelectItem value="vip">VIP</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Duration (months)</label>
+                    <Select value={String(renewDuration)} onValueChange={v => setRenewDuration(Number(v))}>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select duration" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="1">1 month</SelectItem>
+                        <SelectItem value="3">3 months</SelectItem>
+                        <SelectItem value="6">6 months</SelectItem>
+                        <SelectItem value="12">12 months</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                <AlertDialogFooter>
+                  <AlertDialogCancel disabled={renewLoading}>Cancel</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleRenew} disabled={renewLoading} className="bg-blue-600 hover:bg-blue-700 text-white">
+                    {renewLoading ? 'Renewing...' : 'Ok'}
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </div>
         </CardContent>
       </Card>

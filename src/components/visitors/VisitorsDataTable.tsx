@@ -68,7 +68,7 @@ import {
   UserCheck,
   AlertTriangle
 } from 'lucide-react';
-import { format, addMonths, isAfter, differenceInDays } from 'date-fns';
+import { format, addMonths, differenceInDays } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
 

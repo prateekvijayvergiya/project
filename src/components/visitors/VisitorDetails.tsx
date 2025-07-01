@@ -26,7 +26,11 @@ export function VisitorDetails() {
 
   return (
     <div className="max-w-lg mx-auto py-8 px-2 sm:px-4">
-      <Button variant="ghost" onClick={() => navigate(-1)} className="mb-4">
+      <Button 
+        variant="ghost" 
+        onClick={() => navigate(-1)} 
+        className="mb-4 bg-white text-gray-800 border border-gray-200 hover:bg-gray-50"
+      >
         <ArrowLeft className="h-4 w-4 mr-2" /> Back to List
       </Button>
       <Card className="shadow-xl border-0">

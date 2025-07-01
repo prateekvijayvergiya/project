@@ -68,7 +68,7 @@ import {
   UserCheck,
   AlertTriangle
 } from 'lucide-react';
-import { format, addMonths, isAfter } from 'date-fns';
+import { format, addMonths, isAfter, differenceInDays } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
 
@@ -115,9 +115,9 @@ export function VisitorsDataTable() {
 
   const isExpiringSoon = (startDate: string, duration: number) => {
     const expiryDate = getExpiryDate(startDate, duration);
-    const threeDaysFromNow = new Date();
-    threeDaysFromNow.setDate(threeDaysFromNow.getDate() + 3);
-    return isAfter(threeDaysFromNow, expiryDate) && isAfter(expiryDate, new Date());
+    const today = new Date();
+    const days = differenceInDays(expiryDate, today);
+    return days >= 0 && days <= 3;
   };
 
   const handleStatusToggle = async (visitor: Visitor) => {
@@ -210,9 +210,9 @@ export function VisitorsDataTable() {
               )}>
                 {visitor.name}
               </div>
-              {/* Mobile: show duration only */}
+              {/* Mobile: show expiry date only */}
               <div className="text-xs text-gray-500 truncate sm:hidden">
-                Duration: {visitor.duration} month(s)
+                Expires: {format(getExpiryDate(visitor.start_date, visitor.duration), 'MMM dd, yyyy')}
               </div>
               {/* Desktop: show added date */}
               <div className="text-xs text-gray-500 truncate hidden sm:block">
@@ -593,7 +593,7 @@ export function VisitorsDataTable() {
                               </div>
                               <div className="flex-1 min-w-0">
                                 <div className="font-medium text-sm text-gray-900 truncate">{visitor.name}</div>
-                                <div className="text-xs text-gray-500">Duration: {visitor.duration} month(s)</div>
+                                <div className="text-xs text-gray-500">Expires: {format(getExpiryDate(visitor.start_date, visitor.duration), 'MMM dd, yyyy')}</div>
                               </div>
                             </div>
                           </TableCell>

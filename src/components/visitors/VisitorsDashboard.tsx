@@ -138,7 +138,7 @@ export function VisitorsDashboard({ onNavigateToVisitors }: VisitorsDashboardPro
                       <div className="min-w-0 flex-1">
                         <p className="font-medium text-xs sm:text-sm truncate">{visitor.name}</p>
                         <p className="text-xs text-gray-500 truncate">
-                          Joined: {format(new Date(visitor.created_at), 'MMM dd, yyyy')}
+                          Joined: {format(new Date(visitor.start_date), 'MMM dd, yyyy')}
                         </p>
                       </div>
                     </div>

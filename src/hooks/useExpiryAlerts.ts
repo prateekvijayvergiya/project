@@ -23,8 +23,8 @@ export function useExpiryAlerts() {
   );
   const [alertDismissed, setAlertDismissed] = useState(false);
 
-  // Check for expiring subscriptions
-  const checkExpiringSubscriptions = () => {
+  // Always update expiringVisitors when visitors changes
+  useEffect(() => {
     const today = new Date();
     const expiring = visitors
       .filter((visitor) => visitor.status === "active")
@@ -46,8 +46,7 @@ export function useExpiryAlerts() {
       )
       .sort((a, b) => a.daysUntilExpiry - b.daysUntilExpiry);
     setExpiringVisitors(expiring);
-    return expiring;
-  };
+  }, [visitors]);
 
   // Only show the toast once per user login/session
   useEffect(() => {
@@ -58,7 +57,27 @@ export function useExpiryAlerts() {
       !alertDismissed &&
       !sessionStorage.getItem(alertKey)
     ) {
-      const expiring = checkExpiringSubscriptions();
+      // Use the same logic as above to get expiring visitors
+      const today = new Date();
+      const expiring = visitors
+        .filter((visitor) => visitor.status === "active")
+        .map((visitor) => {
+          const expiryDate = addMonths(
+            new Date(visitor.start_date),
+            visitor.duration
+          );
+          const daysUntilExpiry = differenceInDays(expiryDate, today);
+          return {
+            ...visitor,
+            expiryDate,
+            daysUntilExpiry,
+          };
+        })
+        .filter(
+          (visitor) =>
+            visitor.daysUntilExpiry >= 0 && visitor.daysUntilExpiry <= 3
+        )
+        .sort((a, b) => a.daysUntilExpiry - b.daysUntilExpiry);
       if (expiring.length > 0) {
         const expiringToday = expiring.filter((v) => v.daysUntilExpiry === 0);
         const expiringTomorrow = expiring.filter(
@@ -104,7 +123,7 @@ export function useExpiryAlerts() {
 
   const refreshCheck = () => {
     setAlertDismissed(false);
-    return checkExpiringSubscriptions();
+    // Re-run the effect by updating visitors (handled by context)
   };
 
   return {
@@ -113,6 +132,5 @@ export function useExpiryAlerts() {
     alertDismissed,
     dismissAlert,
     refreshCheck,
-    checkExpiringSubscriptions,
   };
 }

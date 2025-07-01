@@ -69,12 +69,6 @@ export function VisitorsDashboard({ onNavigateToVisitors }: VisitorsDashboardPro
     onNavigateToVisitors?.();
   };
 
-  const openRenewDialog = (visitor: any) => {
-    setRenewType(visitor.subscription_type);
-    setRenewDuration(visitor.duration);
-    setRenewDialog({ open: true, visitorId: visitor.id });
-  };
-
   const handleRenew = async () => {
     if (!renewDialog.visitorId) return;
     setRenewLoading(true);

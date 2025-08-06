@@ -51,9 +51,9 @@ export function Statistics() {
   ).length;
 
   const subscriptionTypes = {
-    basic: visitors.filter(v => v.subscription_type === 'basic').length,
-    premium: visitors.filter(v => v.subscription_type === 'premium').length,
-    vip: visitors.filter(v => v.subscription_type === 'vip').length,
+    gym: visitors.filter(v => v.subscription_type === 'gym').length,
+    cardio: visitors.filter(v => v.subscription_type === 'cardio').length,
+    gym_and_cardio: visitors.filter(v => v.subscription_type === 'gym_and_cardio').length,
   };
 
   const averageDuration = visitors.length > 0 
@@ -134,9 +134,9 @@ export function Statistics() {
               {Object.entries(subscriptionTypes).map(([type, count]) => {
                 const percentage = stats.total > 0 ? (count / stats.total) * 100 : 0;
                 const colors = {
-                  basic: 'bg-gray-500',
-                  premium: 'bg-blue-500',
-                  vip: 'bg-purple-500'
+                  gym: 'bg-gray-500',
+                  cardio: 'bg-blue-500',
+                  gym_and_cardio: 'bg-purple-500'
                 };
                 
                 return (
@@ -144,7 +144,9 @@ export function Statistics() {
                     <div className="flex justify-between items-center">
                       <div className="flex items-center space-x-2 min-w-0 flex-1">
                         <div className={`w-3 h-3 rounded-full ${colors[type as keyof typeof colors]} flex-shrink-0`}></div>
-                        <span className="font-medium capitalize text-sm truncate">{type}</span>
+                        <span className="font-medium capitalize text-sm truncate">
+                          {type === 'gym' ? 'Gym' : type === 'cardio' ? 'Cardio' : 'Gym & Cardio'}
+                        </span>
                       </div>
                       <div className="text-right flex-shrink-0">
                         <span className="text-sm font-medium">{count}</span>

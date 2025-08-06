@@ -26,7 +26,15 @@ export function VisitorDetails() {
 
   // Renew dialog state
   const [renewOpen, setRenewOpen] = useState(false);
-  const [renewType, setRenewType] = useState<'basic' | 'premium' | 'vip'>(visitor?.subscription_type || 'basic');
+  // Map legacy types to new types
+  const mapSubscriptionType = (type: string | undefined): 'gym' | 'cardio' | 'gym_and_cardio' => {
+    if (type === 'basic') return 'gym';
+    if (type === 'premium') return 'cardio';
+    if (type === 'vip') return 'gym_and_cardio';
+    if (type === 'gym' || type === 'cardio' || type === 'gym_and_cardio') return type;
+    return 'gym';
+  };
+  const [renewType, setRenewType] = useState<'gym' | 'cardio' | 'gym_and_cardio'>(mapSubscriptionType(visitor?.subscription_type));
   const [renewDuration, setRenewDuration] = useState<number>(visitor?.duration || 1);
   const [renewLoading, setRenewLoading] = useState(false);
 
@@ -127,14 +135,14 @@ export function VisitorDetails() {
                 <div className="space-y-4 py-2">
                   <div>
                     <label className="block text-sm font-medium mb-1">Subscription Type</label>
-                    <Select value={renewType} onValueChange={v => setRenewType(v as 'basic' | 'premium' | 'vip')}>
+                    <Select value={renewType} onValueChange={v => setRenewType(v as 'gym' | 'cardio' | 'gym_and_cardio')}>
                       <SelectTrigger className="w-full">
                         <SelectValue placeholder="Select type" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="basic">Basic</SelectItem>
-                        <SelectItem value="premium">Premium</SelectItem>
-                        <SelectItem value="vip">VIP</SelectItem>
+                        <SelectItem value="gym">Gym</SelectItem>
+                        <SelectItem value="cardio">Cardio</SelectItem>
+                        <SelectItem value="gym_and_cardio">Gym & Cardio</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>

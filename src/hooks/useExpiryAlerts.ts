@@ -15,6 +15,12 @@ export interface ExpiringVisitor {
   daysUntilExpiry: number;
 }
 
+function isExpired(startDate: string, duration: number) {
+  const expiryDate = addMonths(new Date(startDate), duration);
+  const today = new Date();
+  return differenceInDays(expiryDate, today) < 0;
+}
+
 export function useExpiryAlerts() {
   const { visitors } = useVisitors();
   const { user } = useAuth();
@@ -27,7 +33,11 @@ export function useExpiryAlerts() {
   useEffect(() => {
     const today = new Date();
     const expiring = visitors
-      .filter((visitor) => visitor.status === "active")
+      .filter(
+        (visitor) =>
+          visitor.status === "active" &&
+          !isExpired(visitor.start_date, visitor.duration)
+      )
       .map((visitor) => {
         const expiryDate = addMonths(
           new Date(visitor.start_date),
@@ -60,7 +70,11 @@ export function useExpiryAlerts() {
       // Use the same logic as above to get expiring visitors
       const today = new Date();
       const expiring = visitors
-        .filter((visitor) => visitor.status === "active")
+        .filter(
+          (visitor) =>
+            visitor.status === "active" &&
+            !isExpired(visitor.start_date, visitor.duration)
+        )
         .map((visitor) => {
           const expiryDate = addMonths(
             new Date(visitor.start_date),

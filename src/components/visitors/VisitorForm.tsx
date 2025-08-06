@@ -28,7 +28,7 @@ interface VisitorFormData {
   name: string;
   phone: string;
   start_date: string;
-  subscription_type: 'basic' | 'premium' | 'vip';
+  subscription_type: 'gym' | 'cardio' | 'gym_and_cardio';
   duration: number;
   status: 'active' | 'inactive' | 'expired';
   notes: string;
@@ -59,7 +59,7 @@ export function VisitorForm({
     name: initialData?.name || '',
     phone: initialData?.phone || '',
     start_date: initialData?.start_date || format(new Date(), 'yyyy-MM-dd'),
-    subscription_type: initialData?.subscription_type || 'basic',
+    subscription_type: initialData?.subscription_type || 'gym',
     duration: initialData?.duration || 1,
     status: initialData?.status || 'active',
     notes: initialData?.notes || '',
@@ -106,7 +106,7 @@ export function VisitorForm({
     setIsSubmitting(true);
 
     try {
-      await addVisitor({ ...formData, user_id: user.id });
+      await addVisitor(formData);
       
       // Reset form on success
       if (mode === 'create') {
@@ -114,7 +114,7 @@ export function VisitorForm({
           name: '',
           phone: '',
           start_date: format(new Date(), 'yyyy-MM-dd'),
-          subscription_type: 'basic',
+          subscription_type: 'gym',
           duration: 1,
           status: 'active',
           notes: '',
@@ -159,7 +159,7 @@ export function VisitorForm({
       name: '',
       phone: '',
       start_date: format(new Date(), 'yyyy-MM-dd'),
-      subscription_type: 'basic',
+      subscription_type: 'gym',
       duration: 1,
       status: 'active',
       notes: '',
@@ -169,9 +169,9 @@ export function VisitorForm({
   };
 
   const subscriptionOptions = [
-    { value: 'basic', label: 'Basic', description: 'Standard gym access' },
-    { value: 'premium', label: 'Premium', description: 'Gym + group classes' },
-    { value: 'vip', label: 'VIP', description: 'Full access + personal training' },
+    { value: 'gym', label: 'Gym', description: 'Standard gym access' },
+    { value: 'cardio', label: 'Cardio', description: 'Group classes only' },
+    { value: 'gym_and_cardio', label: 'Gym + Cardio', description: 'Full access' },
   ];
 
   const statusOptions = [

@@ -21,7 +21,7 @@ export interface Visitor {
   name: string;
   phone: string;
   start_date: string;
-  subscription_type: "basic" | "premium" | "vip";
+  subscription_type: "gym" | "cardio" | "gym_and_cardio";
   duration: number;
   status: "active" | "inactive" | "expired";
   notes: string;

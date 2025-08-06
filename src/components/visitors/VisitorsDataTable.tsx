@@ -53,7 +53,6 @@ import {
   Edit,
   Trash2,
   Download,
-  Filter,
   Calendar,
   Phone,
   User,
@@ -83,6 +82,7 @@ export function VisitorsDataTable() {
   });
   const [rowSelection, setRowSelection] = useState({});
   const [globalFilter, setGlobalFilter] = useState('');
+  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'expired'>('all');
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [visitorToDelete, setVisitorToDelete] = useState<Visitor | null>(null);
   const [highlightedVisitors, setHighlightedVisitors] = useState<string[]>([]);
@@ -102,11 +102,11 @@ export function VisitorsDataTable() {
 
   const getSubscriptionBadge = (type: string) => {
     const variants = {
-      basic: 'bg-blue-100 text-blue-800 border-blue-300',
-      premium: 'bg-purple-100 text-purple-800 border-purple-300',
-      vip: 'bg-amber-100 text-amber-800 border-amber-300',
+      gym: 'bg-blue-100 text-blue-800 border-blue-300',
+      cardio: 'bg-purple-100 text-purple-800 border-purple-300',
+      gym_and_cardio: 'bg-amber-100 text-amber-800 border-amber-300',
     };
-    return variants[type as keyof typeof variants] || variants.basic;
+    return variants[type as keyof typeof variants] || variants.gym;
   };
 
   const getExpiryDate = (startDate: string, duration: number) => {
@@ -118,6 +118,12 @@ export function VisitorsDataTable() {
     const today = new Date();
     const days = differenceInDays(expiryDate, today);
     return days >= 0 && days <= 3;
+  };
+
+  const isExpired = (startDate: string, duration: number) => {
+    const expiryDate = getExpiryDate(startDate, duration);
+    const today = new Date();
+    return differenceInDays(expiryDate, today) < 0;
   };
 
   const handleStatusToggle = async (visitor: Visitor) => {
@@ -280,7 +286,7 @@ export function VisitorsDataTable() {
         const type = row.getValue('subscription_type') as string;
         return (
           <Badge variant="outline" className={cn(getSubscriptionBadge(type), "text-xs")}>
-            {type.charAt(0).toUpperCase()}
+            {type === 'gym' ? 'Gym' : type === 'cardio' ? 'Cardio' : type === 'gym_and_cardio' ? 'Gym and Cardio' : type}
           </Badge>
         );
       },
@@ -417,13 +423,30 @@ export function VisitorsDataTable() {
   ];
 
   const filteredData = useMemo(() => {
-    if (!globalFilter) return visitors;
+    let filtered = visitors;
     
-    return visitors.filter((visitor) =>
-      visitor.name.toLowerCase().includes(globalFilter.toLowerCase()) ||
-      visitor.phone.toLowerCase().includes(globalFilter.toLowerCase())
-    );
-  }, [visitors, globalFilter]);
+    // Apply status filter
+    if (statusFilter !== 'all') {
+      filtered = filtered.filter((visitor) => {
+        if (statusFilter === 'active') {
+          return visitor.status === 'active' && !isExpired(visitor.start_date, visitor.duration);
+        } else if (statusFilter === 'expired') {
+          return visitor.status === 'expired' || isExpired(visitor.start_date, visitor.duration);
+        }
+        return true;
+      });
+    }
+    
+    // Apply global search filter
+    if (globalFilter) {
+      filtered = filtered.filter((visitor) =>
+        visitor.name.toLowerCase().includes(globalFilter.toLowerCase()) ||
+        visitor.phone.toLowerCase().includes(globalFilter.toLowerCase())
+      );
+    }
+    
+    return filtered;
+  }, [visitors, globalFilter, statusFilter]);
 
   const table = useReactTable({
     data: filteredData,
@@ -545,10 +568,32 @@ export function VisitorsDataTable() {
                 className="pl-8 sm:pl-10 h-9 sm:h-11 text-sm w-full"
               />
             </div>
-            <Button variant="outline" size="sm" className="text-xs sm:text-sm flex-shrink-0">
-              <Filter className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
-              Filters
-            </Button>
+            <div className="flex items-center space-x-2 flex-shrink-0">
+              <Button 
+                variant={statusFilter === 'all' ? 'default' : 'outline'} 
+                size="sm" 
+                onClick={() => setStatusFilter('all')}
+                className="text-xs sm:text-sm"
+              >
+                All
+              </Button>
+              <Button 
+                variant={statusFilter === 'active' ? 'default' : 'outline'} 
+                size="sm" 
+                onClick={() => setStatusFilter('active')}
+                className="text-xs sm:text-sm bg-green-600 hover:bg-green-700 text-white"
+              >
+                Active
+              </Button>
+              <Button 
+                variant={statusFilter === 'expired' ? 'default' : 'outline'} 
+                size="sm" 
+                onClick={() => setStatusFilter('expired')}
+                className="text-xs sm:text-sm bg-red-600 hover:bg-red-700 text-white"
+              >
+                Expired
+              </Button>
+            </div>
           </div>
 
           {/* Data Table */}
